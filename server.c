@@ -6,44 +6,38 @@
 /*   By: marvin <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 15:07:01 by marvin            #+#    #+#             */
-/*   Updated: 2024/08/11 06:34:05 by marvin           ###   ########.fr       */
+/*   Updated: 2024/10/28 19:48:19 by iboukhss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#include "minitalk.h"
 
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
 #include <signal.h>
 
-volatile int	bit_count;
-volatile char	bit_char;
-
-volatile int	sig_handshake;
-volatile int	client_pid;
+volatile t_server_state	g_srv;
 
 void	handle_sigusr(int sig, siginfo_t *info, void *vp)
 {
-	client_pid = info->si_pid;
-	++bit_count;
+	g_srv.client_pid = info->si_pid;
+	++g_srv.bit_count;
 	if (sig == SIGUSR1)
 	{
-		write(STDOUT_FILENO, ".", 1);
-		bit_char = (bit_char << 1) | 0;
+		g_srv.bit_char = (g_srv.bit_char << 1) | 0;
 	}
 	else if (sig == SIGUSR2)
 	{
-		write(STDOUT_FILENO, "1", 1);
-		bit_char = (bit_char << 1) | 1;
+		g_srv.bit_char = (g_srv.bit_char << 1) | 1;
 	}
-	if (bit_count == 8)
+	if (g_srv.bit_count == 8)
 	{
-		write(STDOUT_FILENO, "\n", 1);
-		write(STDOUT_FILENO, (const void *)&bit_char, 1);
-		write(STDOUT_FILENO, "\n", 1);
-		bit_count = 0;
-		bit_char = 0;
+		write(STDOUT_FILENO, (const void *)&g_srv.bit_char, 1);
+		g_srv.bit_count = 0;
+		g_srv.bit_char = 0;
 	}
-	sig_handshake = 1;
+	g_srv.sig_handshake = 1;
 }
 
 int	main(void)
@@ -62,10 +56,10 @@ int	main(void)
 	while (1)
 	{
 		pause();
-		if (sig_handshake)
+		if (g_srv.sig_handshake)
 		{
-			kill(client_pid, SIGUSR1);
-			sig_handshake = 0;
+			kill(g_srv.client_pid, SIGUSR1);
+			g_srv.sig_handshake = 0;
 		}
 	}
 	return (0);

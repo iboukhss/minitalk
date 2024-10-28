@@ -1,5 +1,6 @@
-CC = gcc
-CFLAGS = -Wall -Wextra -g -fsanitize=undefined
+CFLAGS = -Wall -Wextra -g3 -fsanitize=undefined,address
+
+LIBFT = ft_memset.c ft_atoi.c
 
 all: client server
 
@@ -9,12 +10,15 @@ client: client.c
 server: server.c
 	$(CC) $(CFLAGS) $< -o $@
 
+norm:
+	-norminette client.c server.c minitalk.h
+
 clean:
-	rm -f *.o
+	$(RM) *.o
 
 fclean:
-	rm -f client server
+	$(RM) client server
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all norm clean fclean re
