@@ -2,7 +2,7 @@ CFLAGS = -Wall -Wextra -g3 -fsanitize=undefined,address
 
 all: client server
 
-client: client.o ft_memset.o ft_atoi.o
+client: client.o ft_memset.o ft_atoi.o ft_printf.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 server: server.o ft_memset.o ft_printf.o

@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 15:07:01 by marvin            #+#    #+#             */
-/*   Updated: 2024/10/29 20:28:58 by iboukhss         ###   ########.fr       */
+/*   Updated: 2024/10/29 23:50:42 by iboukhss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,30 +16,28 @@
 #include <unistd.h>
 #include <signal.h>
 
-volatile t_server_state	g_srv;
-
-// NOTE: Read `man sigaction` for a refresher on signal handlers.
-// (*sa_sigaction) follows a very specific pattern, hence this prototype.
 static void	handle_sigusr(int sig, siginfo_t *info, void *ucontext)
 {
+	static int				bit_count;
+	static unsigned char	bit_char;
+
 	(void)ucontext;
-	g_srv.client_pid = info->si_pid;
-	g_srv.bit_count += 1;
+	bit_count += 1;
 	if (sig == SIGUSR1)
 	{
-		g_srv.bit_char = (g_srv.bit_char << 1) | 0;
+		bit_char = (bit_char << 1) | 0;
 	}
 	else if (sig == SIGUSR2)
 	{
-		g_srv.bit_char = (g_srv.bit_char << 1) | 1;
+		bit_char = (bit_char << 1) | 1;
 	}
-	if (g_srv.bit_count == 8)
+	if (bit_count == 8)
 	{
-		write(STDOUT_FILENO, (const void *)&g_srv.bit_char, 1);
-		g_srv.bit_count = 0;
-		g_srv.bit_char = 0;
+		write(STDOUT_FILENO, &bit_char, 1);
+		bit_count = 0;
+		bit_char = 0;
 	}
-	g_srv.sig_handshake = 1;
+	kill(info->si_pid, SIGUSR1);
 }
 
 int	main(void)
@@ -58,11 +56,6 @@ int	main(void)
 	while (1)
 	{
 		pause();
-		if (g_srv.sig_handshake)
-		{
-			kill(g_srv.client_pid, SIGUSR1);
-			g_srv.sig_handshake = 0;
-		}
 	}
 	return (0);
 }
