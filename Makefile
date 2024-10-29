@@ -1,22 +1,23 @@
 CFLAGS = -Wall -Wextra -g3 -fsanitize=undefined,address
 
-LIBFT = ft_memset.c ft_atoi.c
-
 all: client server
 
-client: client.c
-	$(CC) $(CFLAGS) $< -o $@
+client: client.o ft_memset.o ft_atoi.o
+	$(CC) $(CFLAGS) $^ -o $@
 
-server: server.c
-	$(CC) $(CFLAGS) $< -o $@
+server: server.o ft_memset.o ft_printf.o
+	$(CC) $(CFLAGS) $^ -o $@
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 norm:
-	-norminette client.c server.c minitalk.h
+	-norminette client.c server.c minitalk.h ft_atoi.c ft_printf.c ft_memset.c libft.h
 
 clean:
 	$(RM) *.o
 
-fclean:
+fclean: clean
 	$(RM) client server
 
 re: fclean all

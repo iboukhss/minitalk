@@ -6,7 +6,7 @@
 /*   By: iboukhss <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/28 19:00:21 by iboukhss          #+#    #+#             */
-/*   Updated: 2024/10/28 19:37:52 by iboukhss         ###   ########.fr       */
+/*   Updated: 2024/10/29 20:06:29 by iboukhss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,13 +31,5 @@ typedef struct s_server_state
 	int		sig_handshake;
 	int		client_pid;
 }	t_server_state;
-
-// Add libc functions here
-
-// memset
-
-// atoi
-
-// printf?
 
 #endif
